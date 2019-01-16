@@ -19,16 +19,16 @@ tf.flags.DEFINE_integer("embedding_size", 100, "Dimensionality of character embe
 tf.flags.DEFINE_integer("hidden_size", 50, "Dimensionality of GRU hidden layer (default: 50)")
 tf.flags.DEFINE_integer("max_document_len", 100, "max allowed document len")
 tf.flags.DEFINE_integer("max_sentence_len", 100, "max allowed sentence len")
-tf.flags.DEFINE_integer("batch_size", 32, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 128, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 2, "Number of training epochs (default: 50)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
 tf.flags.DEFINE_integer("evaluate_every", 20, "evaluate every this many batches")
-tf.flags.DEFINE_float("learning_rate", 0.001, "learning rate")
+tf.flags.DEFINE_float("learning_rate", 0.0005, "learning rate")
 tf.flags.DEFINE_float("grad_clip", 5, "grad clip to prevent gradient explode")
 
 FLAGS = tf.flags.FLAGS
-TRAIN_FILE = './train_demo'
+TRAIN_FILE = './train_aa'
 VALID_FILE = './test_demo'
 #TEST_FILE = ''
 
@@ -119,16 +119,16 @@ with tf.Session() as sess:
                     hidden_size=FLAGS.hidden_size)
 
     with tf.name_scope('loss'):
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=han.input_y,
+        loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=han.input_y,
                                                                       logits=han.out,
                                                                       name='loss',
-                                                                      dim = 0))
+                                                                      ))
 
     with tf.name_scope('accuracy'):
         #predict = tf.argmax(han.out, axis=1, name='predict')
         #label = tf.argmax(han.input_y, axis=1, name='label')
         #acc = tf.reduce_mean(tf.cast(tf.equal(predict, label), tf.float32))
-        predict = han.out
+        predict = tf.sigmoid(han.out)
         label = han.input_y
         acc, auc_op = tf.metrics.auc(label, predict)
 
